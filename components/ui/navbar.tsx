@@ -1,9 +1,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Bell } from "lucide-react";
-import Image from "next/image";
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 
 export interface NavItem {
   label: string;
@@ -15,7 +16,6 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   activeHref?: string;
   items?: NavItem[];
   showActions?: boolean;
-  avatarUrl?: string;
 }
 
 export function Navbar({
@@ -25,7 +25,6 @@ export function Navbar({
     { label: "My Learning", href: "/my-learning" },
   ],
   showActions = true,
-  avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80",
   className,
   ...props
 }: NavbarProps) {
@@ -65,28 +64,35 @@ export function Navbar({
         </div>
 
         {showActions && (
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="w-10 h-10 rounded-full flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400"
-            >
-              <Bell className="w-5 h-5 stroke-[2]" />
-            </button>
-
-            <Link
-              href="/my-learning"
-              className="relative w-9 h-9 rounded-full overflow-hidden border border-neutral-200 shadow-xs focus:outline-none focus:ring-2 focus:ring-primary-400 block bg-neutral-200"
-            >
-              <Image
-                src={avatarUrl}
-                alt="Learner Profile"
-                fill
-                sizes="36px"
-                className="object-cover"
-                unoptimized
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <Button variant="tertiary" size="sm">
+                  Sign in
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button variant="primary" size="sm">
+                  Sign up
+                </Button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <button
+                type="button"
+                aria-label="Notifications"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400"
+              >
+                <Bell className="w-5 h-5 stroke-[2]" />
+              </button>
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-9 h-9",
+                  },
+                }}
               />
-            </Link>
+            </Show>
           </div>
         )}
       </div>

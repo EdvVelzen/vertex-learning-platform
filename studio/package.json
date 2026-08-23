@@ -6,7 +6,7 @@
     "dev": "sanity dev",
     "build": "sanity build",
     "start": "sanity start",
-    "typegen": "sanity schemas extract --force && sanity typegen generate"
+    "typegen": "sanity schemas extract && sanity typegen generate"
   },
   "dependencies": {
     "@sanity/icons": "^3.8.0",

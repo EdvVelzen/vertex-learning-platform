@@ -49,7 +49,7 @@ export const lesson = defineType({
       validation: (rule) => rule.min(0),
     }),
     defineField({
-      name: 'isFreePreview',
+      name: 'freePreview',
       title: 'Free Preview',
       type: 'boolean',
       description:
@@ -104,10 +104,10 @@ export const lesson = defineType({
     select: {
       title: 'title',
       duration: 'duration',
-      isFreePreview: 'isFreePreview',
+      freePreview: 'freePreview',
       media: 'thumbnail',
     },
-    prepare({ title, duration, isFreePreview, media }) {
+    prepare({ title, duration, freePreview, media }) {
       const minutes =
         typeof duration === 'number' ? Math.floor(duration / 60) : null
       const seconds = typeof duration === 'number' ? duration % 60 : null
@@ -116,7 +116,7 @@ export const lesson = defineType({
           ? `${minutes}:${seconds.toString().padStart(2, '0')}`
           : 'No duration'
 
-      const previewBadge = isFreePreview ? ' [Free Preview]' : ''
+      const previewBadge = freePreview ? ' [Free Preview]' : ''
 
       return {
         title: title || 'Untitled Lesson',

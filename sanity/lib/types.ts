@@ -49,8 +49,8 @@ export interface Instructor {
   name: string
   slug: SanitySlug
   photo: SanityImageReference
-  expertise: string
-  bio?: string
+  expertise: string[] | string
+  bio?: PortableTextBlock[] | string
   courseCount?: number
 }
 
@@ -61,6 +61,7 @@ export interface LessonSummary {
   slug: SanitySlug
   duration?: number
   isFreePreview?: boolean
+  freePreview?: boolean
   studentCount?: number
 }
 
@@ -80,9 +81,18 @@ export interface CourseSummary {
   slug: SanitySlug
   summary: string
   coverImage: SanityImageReference
-  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels'
+  level:
+    | 'Beginner'
+    | 'Intermediate'
+    | 'Advanced'
+    | 'All Levels'
+    | 'beginner'
+    | 'intermediate'
+    | 'advanced'
+    | 'all-levels'
   price: number
   isPopular?: boolean
+  popular?: boolean
   studentCount?: number
   category?: Category
   instructor?: Instructor
@@ -105,6 +115,7 @@ export interface LessonDetail {
   thumbnail?: SanityImageReference
   duration?: number
   isFreePreview?: boolean
+  freePreview?: boolean
   studentCount?: number
   keyPoints?: string[]
   proTip?: string

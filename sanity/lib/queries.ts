@@ -33,7 +33,8 @@ export const COURSES_QUERY = defineQuery(/* groq */ `
     coverImage,
     level,
     price,
-    isPopular,
+    "isPopular": coalesce(popular, isPopular, false),
+    popular,
     studentCount,
     category->{
       ${categorySummaryFragment}
@@ -43,7 +44,7 @@ export const COURSES_QUERY = defineQuery(/* groq */ `
     },
     "moduleCount": count(modules),
     "lessonCount": count(modules[].lessons[]),
-    "totalDuration": sum(modules[].lessons[]->duration)
+    "totalDuration": math::sum(modules[].lessons[]->duration)
   }
 `)
 
@@ -51,7 +52,7 @@ export const COURSES_QUERY = defineQuery(/* groq */ `
  * Query: Fetch featured / popular courses
  */
 export const FEATURED_COURSES_QUERY = defineQuery(/* groq */ `
-  *[_type == "course" && (isPopular == true || studentCount > 0)] | order(isPopular desc, studentCount desc)[0...6] {
+  *[_type == "course" && (popular == true || isPopular == true || studentCount > 0)] | order(coalesce(popular, isPopular, false) desc, studentCount desc)[0...6] {
     _id,
     _createdAt,
     title,
@@ -60,7 +61,8 @@ export const FEATURED_COURSES_QUERY = defineQuery(/* groq */ `
     coverImage,
     level,
     price,
-    isPopular,
+    "isPopular": coalesce(popular, isPopular, false),
+    popular,
     studentCount,
     category->{
       ${categorySummaryFragment}
@@ -70,7 +72,7 @@ export const FEATURED_COURSES_QUERY = defineQuery(/* groq */ `
     },
     "moduleCount": count(modules),
     "lessonCount": count(modules[].lessons[]),
-    "totalDuration": sum(modules[].lessons[]->duration)
+    "totalDuration": math::sum(modules[].lessons[]->duration)
   }
 `)
 
@@ -87,7 +89,8 @@ export const COURSE_BY_SLUG_QUERY = defineQuery(/* groq */ `
     coverImage,
     level,
     price,
-    isPopular,
+    "isPopular": coalesce(popular, isPopular, false),
+    popular,
     studentCount,
     category->{
       _id,
@@ -118,13 +121,14 @@ export const COURSE_BY_SLUG_QUERY = defineQuery(/* groq */ `
         title,
         slug,
         duration,
-        isFreePreview,
+        "isFreePreview": coalesce(freePreview, isFreePreview, false),
+        freePreview,
         studentCount
       }
     },
     "moduleCount": count(modules),
     "lessonCount": count(modules[].lessons[]),
-    "totalDuration": sum(modules[].lessons[]->duration)
+    "totalDuration": math::sum(modules[].lessons[]->duration)
   }
 `)
 
@@ -139,7 +143,8 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
     videoUrl,
     thumbnail,
     duration,
-    isFreePreview,
+    "isFreePreview": coalesce(freePreview, isFreePreview, false),
+    freePreview,
     studentCount,
     keyPoints,
     proTip,
@@ -171,7 +176,8 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
           title,
           slug,
           duration,
-          isFreePreview
+          "isFreePreview": coalesce(freePreview, isFreePreview, false),
+          freePreview
         }
       }
     }
@@ -212,14 +218,15 @@ export const INSTRUCTOR_BY_SLUG_QUERY = defineQuery(/* groq */ `
       coverImage,
       level,
       price,
-      isPopular,
+      "isPopular": coalesce(popular, isPopular, false),
+      popular,
       studentCount,
       category->{
         ${categorySummaryFragment}
       },
       "moduleCount": count(modules),
       "lessonCount": count(modules[].lessons[]),
-      "totalDuration": sum(modules[].lessons[]->duration)
+      "totalDuration": math::sum(modules[].lessons[]->duration)
     }
   }
 `)
@@ -254,14 +261,15 @@ export const CATEGORY_BY_SLUG_QUERY = defineQuery(/* groq */ `
       coverImage,
       level,
       price,
-      isPopular,
+      "isPopular": coalesce(popular, isPopular, false),
+      popular,
       studentCount,
       instructor->{
         ${instructorSummaryFragment}
       },
       "moduleCount": count(modules),
       "lessonCount": count(modules[].lessons[]),
-      "totalDuration": sum(modules[].lessons[]->duration)
+      "totalDuration": math::sum(modules[].lessons[]->duration)
     }
   }
 `)

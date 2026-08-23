@@ -48,14 +48,18 @@ export const course = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Beginner', value: 'Beginner' },
-          { title: 'Intermediate', value: 'Intermediate' },
-          { title: 'Advanced', value: 'Advanced' },
-          { title: 'All Levels', value: 'All Levels' },
+          { title: 'Beginner', value: 'beginner' },
+          { title: 'Intermediate', value: 'intermediate' },
+          { title: 'Advanced', value: 'advanced' },
+          { title: 'All Levels', value: 'all-levels' },
+          { title: 'Beginner (Legacy)', value: 'Beginner' },
+          { title: 'Intermediate (Legacy)', value: 'Intermediate' },
+          { title: 'Advanced (Legacy)', value: 'Advanced' },
+          { title: 'All Levels (Legacy)', value: 'All Levels' },
         ],
         layout: 'radio',
       },
-      initialValue: 'Beginner',
+      initialValue: 'beginner',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -67,7 +71,7 @@ export const course = defineType({
       validation: (rule) => rule.required().min(0),
     }),
     defineField({
-      name: 'isPopular',
+      name: 'popular',
       title: 'Popular Badge',
       type: 'boolean',
       description:

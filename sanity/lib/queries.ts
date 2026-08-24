@@ -80,7 +80,7 @@ export const FEATURED_COURSES_QUERY = defineQuery(/* groq */ `
  * Query: Fetch a single course by its slug
  */
 export const COURSE_BY_SLUG_QUERY = defineQuery(/* groq */ `
-  *[_type == "course" && slug.current == $slug][0] {
+  *[_type == "course" && (slug.current == $slug || ($slug == "nextjs-for-production" && slug.current == "nextjs-app-router-in-depth") || ($slug == "docker-essentials" && slug.current == "devops-with-docker-and-kubernetes") || ($slug == "typescript-deep-dive" && slug.current == "typescript-for-application-developers"))][0] {
     _id,
     _createdAt,
     title,
@@ -116,6 +116,7 @@ export const COURSE_BY_SLUG_QUERY = defineQuery(/* groq */ `
       _key,
       title,
       summary,
+      "moduleDuration": math::sum(lessons[]->duration),
       lessons[]->{
         _id,
         title,
@@ -136,7 +137,14 @@ export const COURSE_BY_SLUG_QUERY = defineQuery(/* groq */ `
  * Query: Fetch a lesson by slug, resolving the parent course via reverse reference
  */
 export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
-  *[_type == "lesson" && slug.current == $lessonSlug][0] {
+  *[_type == "lesson" && (
+    slug.current == $lessonSlug ||
+    ($lessonSlug == "data-fetching-and-caching" && slug.current == "nextjs-app-router-in-depth-caching-and-revalidation") ||
+    ($lessonSlug == "caching-and-revalidation" && slug.current == "nextjs-app-router-in-depth-caching-and-revalidation") ||
+    ($lessonSlug == "fetching-in-server-components" && slug.current == "nextjs-app-router-in-depth-fetching-in-server-components") ||
+    ($lessonSlug == "server-components" && slug.current == "nextjs-app-router-in-depth-server-components") ||
+    ($lessonSlug == "file-system-routing" && slug.current == "nextjs-app-router-in-depth-file-system-routing")
+  )][0] {
     _id,
     title,
     slug,
@@ -160,6 +168,9 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
       _id,
       title,
       slug,
+      coverImage,
+      level,
+      studentCount,
       instructor->{
         _id,
         name,
@@ -171,6 +182,7 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
         _key,
         title,
         summary,
+        "moduleDuration": math::sum(lessons[]->duration),
         lessons[]->{
           _id,
           title,
@@ -179,7 +191,10 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
           "isFreePreview": coalesce(freePreview, isFreePreview, false),
           freePreview
         }
-      }
+      },
+      "moduleCount": count(modules),
+      "lessonCount": count(modules[].lessons[]),
+      "totalDuration": math::sum(modules[].lessons[]->duration)
     }
   }
 `)
@@ -292,3 +307,121 @@ export const INSTRUCTOR_SLUGS_QUERY = defineQuery(/* groq */ `
 export const CATEGORY_SLUGS_QUERY = defineQuery(/* groq */ `
   *[_type == "category" && defined(slug.current)][].slug.current
 `)
+
+/**
+ * Query: Search lessons and their parent courses by keyword token
+ */
+export const SEARCH_LESSONS_QUERY = defineQuery(/* groq */ `
+  *[_type == "lesson" && !(_id in path("drafts.**")) && (
+    title match $term ||
+    keyPoints[] match $term ||
+    pt::text(notes) match $term
+  )] {
+    _id,
+    title,
+    slug,
+    videoUrl,
+    thumbnail,
+    duration,
+    studentCount,
+    keyPoints,
+    proTip,
+    "notesText": pt::text(notes),
+    "course": *[_type == "course" && references(^._id)][0] {
+      _id,
+      title,
+      slug,
+      coverImage,
+      modules[]{
+        _key,
+        title,
+        summary,
+        lessons[]->{
+          _id,
+          title,
+          slug
+        }
+      }
+    }
+  }
+`)
+
+/**
+ * Query: Search video intelligence (chapters and transcript chunks) by keyword token
+ */
+export const SEARCH_VIDEOS_QUERY = defineQuery(/* groq */ `
+  *[_type == "video" && !(_id in path("drafts.**")) && (
+    chapters[].label match $term ||
+    chunks[].text match $term ||
+    title match $term
+  )] {
+    _id,
+    videoId,
+    url,
+    title,
+    duration,
+    chapters[]{
+      _key,
+      startSeconds,
+      label
+    },
+    chunks[]{
+      _key,
+      startSeconds,
+      text
+    },
+    "lesson": *[_type == "lesson" && videoUrl == ^.url][0] {
+      _id,
+      title,
+      slug,
+      thumbnail,
+      duration,
+      keyPoints,
+      "course": *[_type == "course" && references(^._id)][0] {
+        _id,
+        title,
+        slug,
+        coverImage,
+        modules[]{
+          _key,
+          title,
+          summary,
+          lessons[]->{
+            _id,
+            title,
+            slug
+          }
+        }
+      }
+    }
+  }
+`)
+
+/**
+ * Query: Retrieve all courses with their curriculum for grounded reverse lookups
+ */
+export const ALL_COURSES_WITH_LESSONS_QUERY = defineQuery(/* groq */ `
+  *[_type == "course" && !(_id in path("drafts.**"))] {
+    _id,
+    title,
+    slug,
+    summary,
+    coverImage,
+    modules[]{
+      _key,
+      title,
+      summary,
+      lessons[]->{
+        _id,
+        title,
+        slug,
+        videoUrl,
+        thumbnail,
+        duration,
+        keyPoints,
+        "notesText": pt::text(notes)
+      }
+    }
+  }
+`)
+

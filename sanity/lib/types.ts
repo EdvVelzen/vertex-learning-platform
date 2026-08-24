@@ -70,6 +70,8 @@ export interface Module {
   _type?: 'module'
   title: string
   summary?: string
+  moduleDuration?: number
+  lessonCount?: number
   lessons: LessonSummary[]
 }
 
@@ -125,7 +127,95 @@ export interface LessonDetail {
     _id: string
     title: string
     slug: SanitySlug
+    coverImage?: SanityImageReference
+    level?: string
+    studentCount?: number
     instructor?: Instructor
     modules: Module[]
+    moduleCount?: number
+    lessonCount?: number
+    totalDuration?: number
   }
 }
+
+export interface VideoChapter {
+  _key?: string
+  startSeconds: number
+  label: string
+}
+
+export interface VideoChunk {
+  _key?: string
+  startSeconds: number
+  text: string
+}
+
+export interface VideoDocument {
+  _id: string
+  _type: 'video'
+  videoId: string
+  url: string
+  title?: string
+  duration?: number
+  chapters?: VideoChapter[]
+  chunks?: VideoChunk[]
+}
+
+export interface AgentContextDocument {
+  _id: string
+  _type: 'sanity.agentContext'
+  title: string
+  slug: SanitySlug
+  instructions?: string
+  groqFilter?: string
+}
+
+export interface VideoSearchResult {
+  id: string
+  type: 'video'
+  title: string
+  summary: string
+  lessonLabel: string
+  moduleLabel: string
+  timestamp: string
+  startSeconds: number
+  duration?: number
+  thumbnail?: SanityImageReference | string
+  course: {
+    title: string
+    slug?: SanitySlug | string
+    icon?: string
+    coverImage?: SanityImageReference
+  }
+  lessonSlug: string
+  courseSlug?: string
+  relevanceScore?: number
+}
+
+export interface LessonSearchResult {
+  id: string
+  type: 'lesson'
+  title: string
+  summary: string
+  moduleLabel: string
+  keyPoints?: string[]
+  course: {
+    title: string
+    slug?: SanitySlug | string
+    icon?: string
+    coverImage?: SanityImageReference
+  }
+  lessonSlug: string
+  courseSlug?: string
+  relevanceScore?: number
+}
+
+export type SearchResult = VideoSearchResult | LessonSearchResult
+
+export interface SearchApiResponse {
+  query: string
+  totalCount: number
+  courseCount: number
+  results: SearchResult[]
+}
+

@@ -1,38 +1,20 @@
-"use client";
-
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { client } from "@/sanity/lib/client";
+import { FEATURED_COURSES_QUERY } from "@/sanity/lib/queries";
+import { CourseSummary } from "@/sanity/lib/types";
 import { Navbar } from "@/components/ui/navbar";
 import { Button } from "@/components/ui/button";
 import { CourseCard } from "@/components/cards/course-card";
-import { Search, ArrowRight, Star } from "lucide-react";
+import { CourseIcon } from "@/components/course/course-icon";
+import { HeroSearch } from "@/components/home/hero-search";
+import { ArrowRight, Star } from "lucide-react";
+import { formatDuration, formatLevel } from "@/lib/formatters";
 
-export default function HomePage() {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Focus search input on Cmd+K / Ctrl+K
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      router.push("/courses");
-    }
-  };
+export default async function HomePage() {
+  const fetchedCourses = await client.fetch<CourseSummary[]>(FEATURED_COURSES_QUERY);
+  // Display top 3 courses for the home showcase
+  const courses = (fetchedCourses || []).slice(0, 3);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFAFC] text-neutral-900 font-sans selection:bg-primary-100 selection:text-primary-500">
@@ -79,30 +61,8 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Search Input Bar */}
-            <div className="w-full max-w-[640px] pt-6">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="relative flex items-center w-full bg-white border border-neutral-200 rounded-[14px] shadow-sm hover:border-neutral-300 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 transition-all duration-150"
-              >
-                <Search className="absolute left-4 w-5 h-5 text-neutral-400 pointer-events-none stroke-[2]" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ask anything about your learning..."
-                  className="w-full h-[52px] sm:h-[56px] pl-12 pr-16 bg-transparent text-neutral-900 text-[15px] placeholder:text-neutral-400 font-sans focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.focus()}
-                  className="absolute right-3.5 flex items-center gap-0.5 px-2 py-1 rounded-[6px] border border-neutral-200 bg-neutral-100/70 text-neutral-500 text-[12px] font-medium select-none hover:bg-neutral-200/60 transition-colors"
-                >
-                  ⌘ K
-                </button>
-              </form>
-            </div>
+            {/* Interactive Search Input Bar */}
+            <HeroSearch />
           </section>
 
           {/* All Courses Section */}
@@ -122,134 +82,26 @@ export default function HomePage() {
 
             {/* Courses Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Card 1: Next.js for Production */}
-              <Link href="/courses/nextjs-for-production" className="block">
-                <CourseCard
-                  orientation="vertical"
-                  title="Next.js for Production"
-                  summary="Build scalable, high-performance web applications with Next.js."
-                  level="Intermediate"
-                  duration="18h 24m"
-                  moduleCount="12 modules"
-                  icon={
-                    <div className="w-14 h-14 bg-black rounded-[14px] flex items-center justify-center text-white font-serif font-bold text-3xl shadow-sm select-none">
-                      N
-                    </div>
-                  }
-                />
-              </Link>
+              {courses.map((course) => {
+                const courseHref = `/courses/${course.slug.current}`;
+                const displayLevel = formatLevel(course.level);
+                const displayDuration = formatDuration(course.totalDuration);
+                const displayModules = `${course.moduleCount || 0} modules`;
 
-              {/* Card 2: Docker Essentials */}
-              <Link href="/courses/docker-essentials" className="block">
-                <CourseCard
-                  orientation="vertical"
-                  title="Docker Essentials"
-                  summary="Containerize applications and streamline your development workflow."
-                  level="Beginner"
-                  duration="10h 12m"
-                  moduleCount="8 modules"
-                  icon={
-                    <div className="w-14 h-14 bg-[#E0F2FE] rounded-[14px] flex items-center justify-center shadow-sm select-none">
-                      <svg
-                        className="w-10 h-10"
-                        viewBox="0 0 48 48"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        {/* Containers */}
-                        <rect
-                          x="11"
-                          y="18"
-                          width="4"
-                          height="3.6"
-                          rx="0.5"
-                          fill="#0284C7"
-                        />
-                        <rect
-                          x="16"
-                          y="18"
-                          width="4"
-                          height="3.6"
-                          rx="0.5"
-                          fill="#0284C7"
-                        />
-                        <rect
-                          x="21"
-                          y="18"
-                          width="4"
-                          height="3.6"
-                          rx="0.5"
-                          fill="#0284C7"
-                        />
-                        <rect
-                          x="16"
-                          y="13.5"
-                          width="4"
-                          height="3.6"
-                          rx="0.5"
-                          fill="#0284C7"
-                        />
-                        <rect
-                          x="21"
-                          y="13.5"
-                          width="4"
-                          height="3.6"
-                          rx="0.5"
-                          fill="#0284C7"
-                        />
-                        <rect
-                          x="21"
-                          y="9"
-                          width="4"
-                          height="3.6"
-                          rx="0.5"
-                          fill="#0284C7"
-                        />
-                        {/* Whale Body */}
-                        <path
-                          d="M5 27C6.5 23.5 10 22.5 14 22.5H28C35 22.5 39 26 40.5 29C41.7 31.2 41 34 38.5 35C36 36 33 36 28 36C17 36 8 35 5 27Z"
-                          fill="#38BDF8"
-                          stroke="#0284C7"
-                          strokeWidth="1.5"
-                        />
-                        {/* Whale Tail */}
-                        <path
-                          d="M40 29C43 27.5 45 25 45.5 23C44.3 24.4 42 25.6 39.6 26.4"
-                          stroke="#0284C7"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
-                        {/* Whale Eye */}
-                        <circle cx="34.5" cy="28" r="1.2" fill="#0F172A" />
-                        {/* Water Spout */}
-                        <path
-                          d="M30 21C30.4 19 32 18.4 33 18.8"
-                          stroke="#0284C7"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </div>
-                  }
-                />
-              </Link>
-
-              {/* Card 3: TypeScript Deep Dive */}
-              <Link href="/courses/typescript-deep-dive" className="block">
-                <CourseCard
-                  orientation="vertical"
-                  title="TypeScript Deep Dive"
-                  summary="Go beyond the basics and write safer, more expressive code."
-                  level="Intermediate"
-                  duration="14h 36m"
-                  moduleCount="10 modules"
-                  icon={
-                    <div className="w-14 h-14 bg-[#3178C6] rounded-[14px] flex items-center justify-center text-white font-sans font-bold text-2xl tracking-tight shadow-sm select-none">
-                      TS
-                    </div>
-                  }
-                />
-              </Link>
+                return (
+                  <Link key={course._id} href={courseHref} className="block">
+                    <CourseCard
+                      orientation="vertical"
+                      title={course.title}
+                      summary={course.summary}
+                      level={displayLevel}
+                      duration={displayDuration}
+                      moduleCount={displayModules}
+                      icon={<CourseIcon course={course} />}
+                    />
+                  </Link>
+                );
+              })}
             </div>
           </section>
 

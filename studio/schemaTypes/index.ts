@@ -5,6 +5,8 @@ import { category } from './documents/category'
 import { course } from './documents/course'
 import { instructor } from './documents/instructor'
 import { lesson } from './documents/lesson'
+import { video } from './documents/video'
+import { agentContext } from './documents/agentContext'
 
 // Objects
 import { blockContent } from './objects/blockContent'
@@ -17,8 +19,10 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     // Documents
     course,
     lesson,
+    video,
     instructor,
     category,
+    agentContext,
 
     // Objects
     moduleType,

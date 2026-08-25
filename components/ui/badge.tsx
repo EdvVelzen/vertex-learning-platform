@@ -20,7 +20,7 @@ export function Badge({
 
   const variantStyles = {
     video: "bg-[#FFEEE5] text-[#EA580C] font-semibold uppercase",
-    lesson: "bg-[#EFF6FF] text-[#2563EB] font-semibold uppercase",
+    lesson: "bg-[#EEF2FF] text-[#4F46E5] font-semibold uppercase",
     popular: "bg-[#FFEEE5] text-[#F97316] font-semibold uppercase",
     neutral: "bg-neutral-100 text-neutral-700 font-medium",
   };

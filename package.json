@@ -11,7 +11,10 @@
     "build:studio": "npm run build --prefix studio",
     "typegen": "npm run typegen --prefix studio",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "video:ingest": "tsx scripts/video-pipeline/cli.ts",
+    "video:ingest:all": "tsx scripts/video-pipeline/cli.ts --all",
+    "video:ingest:dry-run": "tsx scripts/video-pipeline/cli.ts --all --dry-run"
   },
   "dependencies": {
     "@ai-sdk/mcp": "^2.0.36",
@@ -37,6 +40,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
     "tailwindcss": "^4",
+    "tsx": "^4.19.3",
     "typescript": "^5"
   }
 }

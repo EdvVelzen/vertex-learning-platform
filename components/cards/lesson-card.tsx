@@ -86,7 +86,7 @@ export function LessonCard({
         </div>
 
         {/* Bottom Checkmark Circle */}
-        <div className="self-end mt-2 w-6 h-6 rounded-full bg-neutral-200/80 text-neutral-500 flex items-center justify-center">
+        <div className="self-end mt-2 w-6 h-6 rounded-full bg-[#475569] text-white flex items-center justify-center shadow-xs">
           <Check className="w-3.5 h-3.5 stroke-[2.5]" />
         </div>
       </Link>
